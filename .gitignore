@@ -1,0 +1,58 @@
+# Gradle
+.gradle/
+build/
+
+# Local configuration
+local.properties
+
+# Android Studio
+.idea/
+*.iml
+
+# Keystore files
+*.jks
+*.keystore
+
+# Generated files
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Log Files
+*.log
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Kotlin
+.kotlin/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Firebase
+google-services.json
+
+# Signing configs
+signing.properties
+
+# Navigation Safe Args
+.navigation/
+
+# Build outputs
+app/release/
+app/debug/
+
+# Generated APK/AAB
+*.apk
+*.aab
+
+# IntelliJ
+out/
+
+# KSP
+ksp/

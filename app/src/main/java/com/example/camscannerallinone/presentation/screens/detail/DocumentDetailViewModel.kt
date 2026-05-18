@@ -1,0 +1,59 @@
+package com.example.camscannerallinone.presentation.screens.detail
+
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.camscannerallinone.data.util.PdfManager
+import com.example.camscannerallinone.domain.model.Document
+import com.example.camscannerallinone.domain.model.Page
+import com.example.camscannerallinone.domain.repository.DocumentRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+data class DocumentDetailState(
+    val document: Document? = null,
+    val pages: List<Page> = emptyList(),
+    val isExporting: Boolean = false,
+    val exportedPdfPath: String? = null
+)
+
+@HiltViewModel
+class DocumentDetailViewModel @Inject constructor(
+    private val repository: DocumentRepository,
+    private val pdfManager: PdfManager,
+    savedStateHandle: SavedStateHandle
+) : ViewModel() {
+
+    private val documentId: Long = checkNotNull(savedStateHandle["documentId"])
+    
+    private val _state = MutableStateFlow(DocumentDetailState())
+    val state: StateFlow<DocumentDetailState> = _state.asStateFlow()
+
+    init {
+        loadDocument()
+    }
+
+    private fun loadDocument() {
+        viewModelScope.launch {
+            val document = repository.getDocumentById(documentId).first()
+            val pages = repository.getPagesForDocument(documentId).first()
+            _state.value = _state.value.copy(document = document, pages = pages)
+        }
+    }
+
+    fun exportToPdf() {
+        viewModelScope.launch {
+            _state.value = _state.value.copy(isExporting = true)
+            val pdfPath = pdfManager.createPdfFromImages(
+                imagePaths = state.value.pages.map { it.originalImageUri },
+                pdfName = state.value.document?.name ?: "scan"
+            )
+            _state.value = _state.value.copy(isExporting = false, exportedPdfPath = pdfPath)
+        }
+    }
+}

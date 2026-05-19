@@ -10,8 +10,12 @@ sealed class Screen(val route: String) {
         fun createRoute(pageId: Long) = "edit/$pageId"
     }
     object PDFPreview : Screen("pdf_preview/{pdfPath}") {
-        fun createRoute(pdfPath: String) = "pdf_preview/$pdfPath"
+        fun createRoute(pdfPath: String) = "pdf_preview/${java.net.URLEncoder.encode(pdfPath, "UTF-8")}"
     }
     object Settings : Screen("settings")
     object Security : Screen("security")
+    object Folders : Screen("folders")
+    object FolderDetail : Screen("folder/{folderId}") {
+        fun createRoute(folderId: Long) = "folder/$folderId"
+    }
 }

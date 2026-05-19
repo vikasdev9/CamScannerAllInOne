@@ -12,6 +12,7 @@ fun DocumentEntity.toDomain(): Document {
         thumbnailUri = thumbnailUri,
         pageCount = pageCount,
         folderId = folderId,
+        pdfPath = pdfPath,
         isFavorite = isFavorite,
         isLocked = isLocked,
         fileSize = fileSize
@@ -27,6 +28,7 @@ fun Document.toEntity(): DocumentEntity {
         thumbnailUri = thumbnailUri,
         pageCount = pageCount,
         folderId = folderId,
+        pdfPath = pdfPath,
         isFavorite = isFavorite,
         isLocked = isLocked,
         fileSize = fileSize

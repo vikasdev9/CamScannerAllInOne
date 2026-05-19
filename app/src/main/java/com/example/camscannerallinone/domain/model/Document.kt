@@ -10,6 +10,7 @@ data class Document(
     val thumbnailUri: String? = null,
     val pageCount: Int = 0,
     val folderId: Long? = null,
+    val pdfPath: String? = null,
     val isFavorite: Boolean = false,
     val isLocked: Boolean = false,
     val tags: List<Tag> = emptyList(),

@@ -72,6 +72,31 @@ class EditViewModel @Inject constructor(
         }
     }
 
+    fun rotateImage() {
+        val current = state.value.currentBitmap ?: return
+        val matrix = android.graphics.Matrix().apply { postRotate(90f) }
+        val rotated = Bitmap.createBitmap(current, 0, 0, current.width, current.height, matrix, true)
+        _state.value = _state.value.copy(currentBitmap = rotated)
+    }
+
+    fun enhanceImage() {
+        // Enhancement can be magic color or similar sharpening
+        applyFilter(FilterType.MAGIC_COLOR)
+    }
+
+    fun autoCrop() {
+        val original = state.value.originalBitmap ?: return
+        _state.value = _state.value.copy(isLoading = true)
+        viewModelScope.launch {
+            val corners = imageProcessor.detectDocumentCorners(original)
+            val cropped = imageProcessor.perspectiveTransform(original, corners)
+            _state.value = _state.value.copy(
+                currentBitmap = cropped,
+                isLoading = false
+            )
+        }
+    }
+
     fun saveChanges() {
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true)

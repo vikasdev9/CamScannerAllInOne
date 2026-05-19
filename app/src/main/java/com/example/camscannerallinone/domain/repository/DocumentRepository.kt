@@ -1,6 +1,7 @@
 package com.example.camscannerallinone.domain.repository
 
 import com.example.camscannerallinone.domain.model.Document
+import com.example.camscannerallinone.domain.model.Folder
 import com.example.camscannerallinone.domain.model.Page
 import com.example.camscannerallinone.domain.model.Tag
 import kotlinx.coroutines.flow.Flow
@@ -27,4 +28,12 @@ interface DocumentRepository {
     suspend fun insertTag(tag: Tag): Long
     suspend fun addTagToDocument(documentId: Long, tagId: Long)
     suspend fun removeTagFromDocument(documentId: Long, tagId: Long)
+
+    // Folder operations
+    fun getAllFolders(): Flow<List<Folder>>
+    suspend fun getFolderById(id: Long): Folder?
+    suspend fun insertFolder(folder: Folder): Long
+    suspend fun updateFolder(folder: Folder)
+    suspend fun deleteFolder(folder: Folder)
+    fun getDocumentsInFolder(folderId: Long): Flow<List<Document>>
 }

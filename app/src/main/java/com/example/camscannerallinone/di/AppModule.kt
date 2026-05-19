@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.example.camscannerallinone.data.local.AppDatabase
 import com.example.camscannerallinone.data.local.dao.DocumentDao
+import com.example.camscannerallinone.data.local.dao.FolderDao
 import com.example.camscannerallinone.data.local.dao.PageDao
 import com.example.camscannerallinone.data.repository.DocumentRepositoryImpl
 import com.example.camscannerallinone.domain.repository.DocumentRepository
@@ -42,10 +43,17 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideFolderDao(database: AppDatabase): FolderDao {
+        return database.folderDao()
+    }
+
+    @Provides
+    @Singleton
     fun provideDocumentRepository(
         documentDao: DocumentDao,
-        pageDao: PageDao
+        pageDao: PageDao,
+        folderDao: FolderDao
     ): DocumentRepository {
-        return DocumentRepositoryImpl(documentDao, pageDao)
+        return DocumentRepositoryImpl(documentDao, pageDao, folderDao)
     }
 }

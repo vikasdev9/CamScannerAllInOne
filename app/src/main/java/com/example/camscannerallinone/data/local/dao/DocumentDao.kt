@@ -28,4 +28,10 @@ interface DocumentDao {
 
     @Query("SELECT * FROM documents WHERE name LIKE '%' || :query || '%'")
     fun searchDocuments(query: String): Flow<List<DocumentEntity>>
+
+    @Query("SELECT * FROM documents WHERE folderId = :folderId ORDER BY updatedAt DESC")
+    fun getDocumentsInFolder(folderId: Long): Flow<List<DocumentEntity>>
+
+    @Query("SELECT * FROM documents WHERE folderId IS NULL ORDER BY updatedAt DESC")
+    fun getUncategorizedDocuments(): Flow<List<DocumentEntity>>
 }

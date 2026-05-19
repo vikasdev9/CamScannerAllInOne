@@ -13,8 +13,9 @@ data class DocumentEntity(
     val updatedAt: Date,
     val thumbnailUri: String?,
     val pageCount: Int,
-    val folderId: Long?,
-    val isFavorite: Boolean,
-    val isLocked: Boolean,
-    val fileSize: Long
+    val folderId: Long? = null, // Linked to FolderEntity
+    val pdfPath: String? = null, // Path to generated PDF
+    val isFavorite: Boolean = false,
+    val isLocked: Boolean = false,
+    val fileSize: Long = 0
 )

@@ -139,4 +139,53 @@ class ImageProcessor @Inject constructor() {
         Utils.matToBitmap(dst, result)
         return result
     }
+
+    fun detectDocumentCorners(bitmap: Bitmap): List<Point> {
+        val mat = Mat()
+        Utils.bitmapToMat(bitmap, mat)
+        
+        val gray = Mat()
+        Imgproc.cvtColor(mat, gray, Imgproc.COLOR_RGB2GRAY)
+        Imgproc.GaussianBlur(gray, gray, Size(5.0, 5.0), 0.0)
+        
+        val edges = Mat()
+        Imgproc.Canny(gray, edges, 75.0, 200.0)
+        
+        val contours = mutableListOf<org.opencv.core.MatOfPoint>()
+        val hierarchy = Mat()
+        Imgproc.findContours(edges, contours, hierarchy, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE)
+        
+        contours.sortByDescending { Imgproc.contourArea(it) }
+        
+        for (contour in contours) {
+            val peri = Imgproc.arcLength(MatOfPoint2f(*contour.toArray()), true)
+            val approx = MatOfPoint2f()
+            Imgproc.approxPolyDP(MatOfPoint2f(*contour.toArray()), approx, 0.02 * peri, true)
+            
+            if (approx.total() == 4L) {
+                val points = approx.toArray().map { Point(it.x.toFloat(), it.y.toFloat()) }
+                return sortPoints(points)
+            }
+        }
+        
+        // Default to image corners if no document found
+        return listOf(
+            Point(0f, 0f),
+            Point(bitmap.width.toFloat(), 0f),
+            Point(bitmap.width.toFloat(), bitmap.height.toFloat()),
+            Point(0f, bitmap.height.toFloat())
+        )
+    }
+
+    private fun sortPoints(points: List<Point>): List<Point> {
+        val sorted = points.sortedBy { it.x + it.y }
+        val tl = sorted[0]
+        val br = sorted[3]
+        
+        val diff = points.sortedBy { it.y - it.x }
+        val tr = diff[0]
+        val bl = diff[3]
+        
+        return listOf(tl, tr, br, bl)
+    }
 }

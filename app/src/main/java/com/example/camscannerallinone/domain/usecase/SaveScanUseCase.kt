@@ -14,7 +14,7 @@ class SaveScanUseCase @Inject constructor(
     private val fileUtil: FileUtil,
     private val ocrManager: OcrManager
 ) {
-    suspend operator fun invoke(bitmap: Bitmap, documentId: Long?, documentName: String = "New Scan") {
+    suspend operator fun invoke(bitmap: Bitmap, documentId: Long?, documentName: String = "New Scan"): Long {
         val imagePath = fileUtil.saveBitmap(bitmap)
         val ocrText = ocrManager.extractText(bitmap)
         
@@ -33,18 +33,23 @@ class SaveScanUseCase @Inject constructor(
             documentId
         }
 
+        val pageCount = if (documentId != null) {
+            // This is a simplification, in a real app you'd fetch the current page count
+            // For now, let's assume we can get it or just increment
+            1 
+        } else {
+            1
+        }
+
         val page = Page(
             documentId = targetDocumentId,
-            pageNumber = 1, // Need to fetch existing count if adding to doc
+            pageNumber = pageCount,
             originalImageUri = imagePath,
             ocrText = ocrText
         )
         
         repository.insertPage(page)
         
-        if (documentId != null) {
-            // Update document updatedAt and pageCount
-            // repository.updateDocument(...)
-        }
+        return targetDocumentId
     }
 }

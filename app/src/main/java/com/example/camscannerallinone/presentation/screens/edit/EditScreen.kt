@@ -10,9 +10,10 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.RotateRight
+import androidx.compose.material.icons.filled.AutoFixHigh
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Crop
-import androidx.compose.material.icons.filled.RotateRight
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -86,10 +87,13 @@ fun EditScreen(
                     .padding(8.dp),
                 horizontalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceEvenly
             ) {
-                IconButton(onClick = { /* Rotate */ }) {
-                    Icon(Icons.Default.RotateRight, contentDescription = "Rotate")
+                IconButton(onClick = { viewModel.rotateImage() }) {
+                    Icon(Icons.AutoMirrored.Filled.RotateRight, contentDescription = "Rotate")
                 }
-                IconButton(onClick = { /* Crop */ }) {
+                IconButton(onClick = { viewModel.enhanceImage() }) {
+                    Icon(Icons.Default.AutoFixHigh, contentDescription = "Enhance")
+                }
+                IconButton(onClick = { viewModel.autoCrop() }) {
                     Icon(Icons.Default.Crop, contentDescription = "Crop")
                 }
             }

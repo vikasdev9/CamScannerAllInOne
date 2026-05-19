@@ -1,20 +1,24 @@
 package com.example.camscannerallinone.data.repository
 
 import com.example.camscannerallinone.data.local.dao.DocumentDao
+import com.example.camscannerallinone.data.local.dao.FolderDao
 import com.example.camscannerallinone.data.local.dao.PageDao
 import com.example.camscannerallinone.data.mapper.toDomain
 import com.example.camscannerallinone.data.mapper.toEntity
 import com.example.camscannerallinone.domain.model.Document
+import com.example.camscannerallinone.domain.model.Folder
 import com.example.camscannerallinone.domain.model.Page
 import com.example.camscannerallinone.domain.model.Tag
 import com.example.camscannerallinone.domain.repository.DocumentRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.flowOf
 import javax.inject.Inject
 
 class DocumentRepositoryImpl @Inject constructor(
     private val documentDao: DocumentDao,
-    private val pageDao: PageDao
+    private val pageDao: PageDao,
+    private val folderDao: FolderDao
 ) : DocumentRepository {
 
     override fun getAllDocuments(): Flow<List<Document>> {
@@ -72,8 +76,7 @@ class DocumentRepositoryImpl @Inject constructor(
     }
 
     override fun getAllTags(): Flow<List<Tag>> {
-        // TODO: Implement Tag operations
-        return kotlinx.coroutines.flow.flowOf(emptyList())
+        return flowOf(emptyList())
     }
 
     override suspend fun insertTag(tag: Tag): Long {
@@ -83,4 +86,32 @@ class DocumentRepositoryImpl @Inject constructor(
     override suspend fun addTagToDocument(documentId: Long, tagId: Long) {}
 
     override suspend fun removeTagFromDocument(documentId: Long, tagId: Long) {}
+
+    override fun getAllFolders(): Flow<List<Folder>> {
+        return folderDao.getAllFolders().map { entities ->
+            entities.map { it.toDomain() }
+        }
+    }
+
+    override suspend fun getFolderById(id: Long): Folder? {
+        return folderDao.getFolderById(id)?.toDomain()
+    }
+
+    override suspend fun insertFolder(folder: Folder): Long {
+        return folderDao.insertFolder(folder.toEntity())
+    }
+
+    override suspend fun updateFolder(folder: Folder) {
+        folderDao.updateFolder(folder.toEntity())
+    }
+
+    override suspend fun deleteFolder(folder: Folder) {
+        folderDao.deleteFolder(folder.toEntity())
+    }
+
+    override fun getDocumentsInFolder(folderId: Long): Flow<List<Document>> {
+        return documentDao.getDocumentsInFolder(folderId).map { entities ->
+            entities.map { it.toDomain() }
+        }
+    }
 }

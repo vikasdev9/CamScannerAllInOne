@@ -16,7 +16,10 @@ import com.example.camscannerallinone.presentation.navigation.Screen
 import com.example.camscannerallinone.presentation.screens.camera.CameraScreen
 import com.example.camscannerallinone.presentation.screens.detail.DocumentDetailScreen
 import com.example.camscannerallinone.presentation.screens.edit.EditScreen
+import com.example.camscannerallinone.presentation.screens.folders.FolderDetailScreen
+import com.example.camscannerallinone.presentation.screens.folders.FolderScreen
 import com.example.camscannerallinone.presentation.screens.home.HomeScreen
+import com.example.camscannerallinone.presentation.screens.pdf.PDFPreviewScreen
 import com.example.camscannerallinone.presentation.theme.ScanFlowTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -47,6 +50,28 @@ fun ScanFlowNavHost() {
                 onNavigateToCamera = { navController.navigate(Screen.Camera.route) },
                 onNavigateToDetail = { id -> 
                     navController.navigate(Screen.DocumentDetail.createRoute(id)) 
+                },
+                onNavigateToFolders = { navController.navigate(Screen.Folders.route) }
+            )
+        }
+
+        composable(Screen.Folders.route) {
+            FolderScreen(
+                onNavigateToFiles = { navController.navigate(Screen.Home.route) },
+                onNavigateToFolderDetail = { id -> 
+                    navController.navigate(Screen.FolderDetail.createRoute(id)) 
+                }
+            )
+        }
+
+        composable(
+            route = Screen.FolderDetail.route,
+            arguments = listOf(navArgument("folderId") { type = NavType.LongType })
+        ) {
+            FolderDetailScreen(
+                onBack = { navController.popBackStack() },
+                onNavigateToDocumentDetail = { id ->
+                    navController.navigate(Screen.DocumentDetail.createRoute(id)) 
                 }
             )
         }
@@ -57,7 +82,8 @@ fun ScanFlowNavHost() {
         ) {
             DocumentDetailScreen(
                 onBack = { navController.popBackStack() },
-                onNavigateToEdit = { id -> navController.navigate(Screen.EditPage.createRoute(id)) }
+                onNavigateToEdit = { id -> navController.navigate(Screen.EditPage.createRoute(id)) },
+                onNavigateToPDF = { path -> navController.navigate(Screen.PDFPreview.createRoute(path)) }
             )
         }
 
@@ -69,10 +95,26 @@ fun ScanFlowNavHost() {
                 onBack = { navController.popBackStack() }
             )
         }
+
+        composable(
+            route = Screen.PDFPreview.route,
+            arguments = listOf(navArgument("pdfPath") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val encodedPath = backStackEntry.arguments?.getString("pdfPath") ?: ""
+            val decodedPath = java.net.URLDecoder.decode(encodedPath, "UTF-8")
+            PDFPreviewScreen(
+                pdfPath = decodedPath,
+                onBack = { navController.popBackStack() }
+            )
+        }
         
         composable(Screen.Camera.route) {
             CameraScreen(
-                onScanComplete = { navController.popBackStack() }
+                onScanComplete = { id -> 
+                    navController.popBackStack() // Remove Camera from stack
+                    navController.navigate(Screen.DocumentDetail.createRoute(id)) 
+                },
+                onClose = { navController.popBackStack() }
             )
         }
     }
